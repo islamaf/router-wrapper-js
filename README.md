@@ -1,5 +1,14 @@
 # RouterWrapperJS
-A wrapper for express routes, making them more compact with better chaining. Abstracting middlewares and other functions.
+<p align="center">
+  <img src="https://img.shields.io/github/package-json/v/islamaf/router-wrapper-js">
+  <img src="https://img.shields.io/librariesio/release/npm/router-wrapper-js">
+  <!-- <img src="https://img.shields.io/npm/dm/router-wrapper-js"> -->
+  <img src="https://img.shields.io/github/license/islamaf/router-wrapper-js">
+  <img src="https://img.shields.io/github/contributors/islamaf/router-wrapper-js">
+  <img src="https://img.shields.io/github/last-commit/islamaf/router-wrapper-js">
+</p>
+
+**RouterWrapperJS** is a wrapper for express routes, making them more compact with better chaining. Abstracting middlewares and other functions.
 
 Currently supported middleware:
 * Multer
@@ -7,6 +16,16 @@ Currently supported middleware:
 However, you can simply append your custom middleware to a route by adding it to the `custom` array in each route. Examples are supported below.
 
 # Getting Started
+### Install RouterWrapperJS via npm:
+```
+npm i router-wrapper-js
+```
+### Install RouterWrapperJS via yarn:
+```
+yarn add router-wrapper-js
+```
+
+### Usage
 The basic structure for the GET and DELETE methods:
 ```
 // GET METHOD
