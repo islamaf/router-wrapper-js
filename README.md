@@ -97,7 +97,7 @@ Just as how you would do it with normal Multer usage, here, the middleware is se
 ```
 
 # Using Custom Middleware
-Usins a custom middleware for a route can be done by adding an array of the needed custom middlewares as the last parameter for the route function.
+Using a custom middleware for a route can be done by adding an array of the needed custom middlewares as the last parameter for the route function.
 ```ts
 .protectedPatch("/book", async (req: Request) => await editBookController(req), {
         multer: [
@@ -110,8 +110,31 @@ Usins a custom middleware for a route can be done by adding an array of the need
 )
 ```
 
+# Controller Handler
+The controller handler basically wraps the controller function. The format of the expected ```data``` object returned from the controller function in you ```app``` is supposed to look like this:
+```ts
+data: {
+    status: number, // Status code of the operation
+    success: boolean, // Success state of the operation
+    data: {} // Data returned from the operation
+}
+```
+
+### Example usage
+```ts
+const newUserController = async (req: Request) => {
+    const res = await addNewUserService(req)
+
+    return {
+        status: res.status,
+        success: res.success,
+        data: res.data
+    }
+}
+```
+
 # Open to contributors
-To add a middleware which might be useful in general use with the express router wrapper, kindly, make a pull request with your extended implementation. 
+To add a middleware which might be useful in general use with the express router wrapper, kindly, make a pull request with your extended implementation.  
 Also, looking forward to extend the wrapping beyond ExpressJs only and include router wrapping for other JS backend frameworks!
 
 Thank you:)
