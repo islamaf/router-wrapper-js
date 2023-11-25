@@ -17,17 +17,17 @@ However, you can simply append your custom middleware to a route by adding it to
 
 # Getting Started
 ### Install RouterWrapperJS via npm:
-```
+```shell
 npm i router-wrapper-js
 ```
 ### Install RouterWrapperJS via yarn:
-```
+```shell
 yarn add router-wrapper-js
 ```
 
 ### Usage
 The basic structure for the GET and DELETE methods:
-```
+```ts
 // GET METHOD
 .get("/", async () => await homeController(), [CUSTOM_MIDDLEWARES])
 
@@ -35,7 +35,7 @@ The basic structure for the GET and DELETE methods:
 .delete("/user/:id", async () => await deleteUserController(), [CUSTOM_MIDDLEWARES])
 ```
 While for the rest of the methods:
-```
+```ts
 // POST METHOD
 .post("/user", async (req: Request) => await newUserController(req), { 
     multer: "image" 
@@ -48,7 +48,7 @@ While for the rest of the methods:
 ```
 
 An example of wrapping a router with all its methods:  
-```
+```ts
 import express, { Request } from "express";
 import { RouterWrapper } from "express-router-wrapper";
 
@@ -78,18 +78,18 @@ app.listen(5000);
 # Using Multer as route Middleware
 Just as how you would do it with normal Multer usage, here, the middleware is set depending on the Multer params passed to the route function.  
 * For passing array of images:  
-```
+```ts
 .post("/book", async (req: Request) => await newBookController(req), { multer: {
     fieldName: "images",
     maxCount: 5
 }}) 
 ```
 * For passing a single image:  
-```
+```ts
 .post("/user", async (req: Request) => await newUserController(req), { multer: "image" })
 ```
 * For passing fields:
-```
+```ts
 .post("/book", async (req: Request) => await newBookController(req), { multer: [
     { name: "cover", maxCount: 1 },
     { name: "back", maxCount: 1 }
@@ -98,7 +98,7 @@ Just as how you would do it with normal Multer usage, here, the middleware is se
 
 # Using Custom Middleware
 Usins a custom middleware for a route can be done by adding an array of the needed custom middlewares as the last parameter for the route function.
-```
+```ts
 .protectedPatch("/book", async (req: Request) => await editBookController(req), {
         multer: [
             { name: "cover", maxCount: 1 },
