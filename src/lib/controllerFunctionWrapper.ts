@@ -9,11 +9,11 @@ import { Request, Response, NextFunction } from "express";
 export const cfw = (cf: Function) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const data = await cf(req);
+            const result = await cf(req);
 
             return res
-                .status(data.status)
-                .json({ success: data.success, data: data.data });
+                .status(result.status)
+                .json({ success: result.success, data: result.data });
         } catch (e) {
             next(e);
         }
