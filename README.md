@@ -1,4 +1,4 @@
-# Express Router Wrapper
+# RouterWrapperJS
 A wrapper for express routes, making them more compact with better chaining. Abstracting middlewares and other functions.
 
 Currently supported middleware:
@@ -93,6 +93,7 @@ Usins a custom middleware for a route can be done by adding an array of the need
 
 # Open to contributors
 To add a middleware which might be useful in general use with the express router wrapper, kindly, make a pull request with your extended implementation. 
+Also, looking forward to extend the wrapping beyond ExpressJs only and include router wrapping for other JS backend frameworks!
 
 Thank you:)
 

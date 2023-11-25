@@ -1,7 +1,10 @@
 {
-  "name": "express-router-wrapper",
+  "name": "router-wrapper-js",
   "description": "A router wrapper for Express",
-  "repository": "islamaf/express-router-wrapper",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/islamaf/router-wrapper-js.git"
+  },
   "version": "1.0.0",
   "author": "Islam Abdelfattah <islam_9t9@yahoo.com>",
   "main": "index.js",
