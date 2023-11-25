@@ -2,36 +2,71 @@ import { Router } from "express";
 import { Field, Multer } from "multer";
 import { cfw } from "./controllerFunctionWrapper";
 
-type Handler = {
+export type Handler = {
     path: string;
     f: Function;
     custom?: any[];
 };
-type RequiresAuth = {
+export type RequiresAuth = {
     requiresAuth?: boolean;
 };
-type MulterParam = Field[] | string | { fieldName: string; maxCount?: number };
-type Get = Handler & RequiresAuth;
-type Post = Handler & RequiresAuth & { multer?: MulterParam };
-type Patch = Handler & RequiresAuth & { multer?: MulterParam };
-type Delete = Handler & RequiresAuth;
-type Services = {
+export type MulterParam =
+    | Field[]
+    | string
+    | { fieldName: string; maxCount?: number };
+export type Get = Handler & RequiresAuth;
+export type Post = Handler & RequiresAuth & { multer?: MulterParam };
+export type Patch = Handler & RequiresAuth & { multer?: MulterParam };
+export type Delete = Handler & RequiresAuth;
+export type Services = {
     multer?: Multer;
     auth?: any;
 };
-type Options = {
+export type Options = {
     multer?: MulterParam;
 };
-type Middlewares = {
+export type Middlewares = {
     requiresAuth: boolean;
     multer?: MulterParam;
     custom?: any[];
 };
 
+interface RouterWrapper {
+    get(path: string, f: Function, custom?: any[]): RouterWrapper;
+    protectedGet(path: string, f: Function, custom?: any[]): RouterWrapper;
+    post(
+        path: string,
+        f: Function,
+        options?: Options,
+        custom?: any[]
+    ): RouterWrapper;
+    protectedPost(
+        path: string,
+        f: Function,
+        options?: Options,
+        custom?: any[]
+    ): RouterWrapper;
+    patch(
+        path: string,
+        f: Function,
+        options?: Options,
+        custom?: any[]
+    ): RouterWrapper;
+    protectedPatch(
+        path: string,
+        f: Function,
+        options?: Options,
+        custom?: any[]
+    ): RouterWrapper;
+    delete(path: string, f: Function, custom?: any[]): RouterWrapper;
+    protectedDelete(path: string, f: Function, custom?: any[]): RouterWrapper;
+    make(): Router;
+}
+
 /**
  * Router Wrapper class for wrapping express router to be more compact and chainable
  */
-class RouterWrapper {
+class RouterWrapper implements RouterWrapper {
     private router: Router;
     private multer: Multer | undefined;
     constructor(private services: Services = {}) {
@@ -48,7 +83,7 @@ class RouterWrapper {
      * @param custom Custom middleware
      * @returns Router Wrapper object
      */
-    get(path: string, f: Function, custom = []) {
+    get(path: string, f: Function, custom?: any[]) {
         return this.getHandler({ path, f, custom });
     }
 
@@ -59,7 +94,7 @@ class RouterWrapper {
      * @param custom Custom middleware
      * @returns Router Wrapper object
      */
-    protectedGet(path: string, f: Function, custom = []) {
+    protectedGet(path: string, f: Function, custom?: any[]) {
         return this.getHandler({ path, f, requiresAuth: true, custom });
     }
 
@@ -71,7 +106,7 @@ class RouterWrapper {
      * @param options Object of options to include supported middlware
      * @returns Router Wrapper object
      */
-    post(path: string, f: Function, options?: Options, custom = []) {
+    post(path: string, f: Function, options?: Options, custom?: any[]) {
         return this.postHandler({ path, f, multer: options?.multer, custom });
     }
 
@@ -83,7 +118,12 @@ class RouterWrapper {
      * @param options Object of options to include supported middlware
      * @returns Router Wrapper object
      */
-    protectedPost(path: string, f: Function, options?: Options, custom = []) {
+    protectedPost(
+        path: string,
+        f: Function,
+        options?: Options,
+        custom?: any[]
+    ) {
         return this.postHandler({
             path,
             f,
@@ -101,7 +141,7 @@ class RouterWrapper {
      * @param options Object of options to include supported middlware
      * @returns Router Wrapper object
      */
-    patch(path: string, f: Function, options?: Options, custom = []) {
+    patch(path: string, f: Function, options?: Options, custom?: any[]) {
         return this.patchHandler({ path, f, multer: options?.multer, custom });
     }
 
@@ -113,7 +153,12 @@ class RouterWrapper {
      * @param options Object of options to include supported middlware
      * @returns Router Wrapper object
      */
-    protectedPatch(path: string, f: Function, options?: Options, custom = []) {
+    protectedPatch(
+        path: string,
+        f: Function,
+        options?: Options,
+        custom?: any[]
+    ) {
         return this.patchHandler({
             path,
             f,
@@ -130,7 +175,7 @@ class RouterWrapper {
      * @param custom Custom middleware
      * @returns Router Wrapper object
      */
-    delete(path: string, f: Function, custom = []) {
+    delete(path: string, f: Function, custom?: any[]) {
         return this.deleteHandler({ path, f, custom });
     }
 
@@ -141,7 +186,7 @@ class RouterWrapper {
      * @param custom Custom middleware
      * @returns Router Wrapper object
      */
-    protectedDelete(path: string, f: Function, custom = []) {
+    protectedDelete(path: string, f: Function, custom?: any[]) {
         return this.deleteHandler({ path, f, requiresAuth: true, custom });
     }
 
