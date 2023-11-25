@@ -1,6 +1,6 @@
 {
   "name": "router-wrapper-js",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A router wrapper for Express",
   "repository": {
     "type": "git",
