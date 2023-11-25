@@ -111,7 +111,7 @@ Using a custom middleware for a route can be done by adding an array of the need
 ```
 
 # Controller Handler
-The controller handler basically wraps the controller function. The format of the expected ```data``` object returned from the controller function in you ```app``` is supposed to look like this:
+The router wrapper has a controller handler which basically wraps the controller function passed to the route function. The format of the expected returned ```data``` object from the controller function in your ```app``` is supposed to look like this:
 ```ts
 data: {
     status: number, // Status code of the operation
@@ -121,6 +121,7 @@ data: {
 ```
 
 ### Example usage
+Taking the ```newUserController()``` as an example:
 ```ts
 const newUserController = async (req: Request) => {
     const res = await addNewUserService(req)
