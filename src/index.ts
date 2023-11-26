@@ -1,3 +1,3 @@
-import { RouterWrapper } from "./lib";
+import { ExpressRouterWrapper, FastifyRouterWrapper } from "./lib";
 
-export { RouterWrapper };
+export { ExpressRouterWrapper, FastifyRouterWrapper };
