@@ -172,8 +172,8 @@ const newUserController = async (req: Request) => {
 ```
 
 # Open to contributors
-To add a middleware which might be useful in general use with the express router wrapper, kindly, make a pull request with your extended implementation.  
-Also, looking forward to extend the wrapping beyond ExpressJs only and include router wrapping for other JS backend frameworks!
+To add a middleware which might be useful in general use with the router wrapper, kindly, make a pull request with your extended implementation.  
+Also, looking forward to extend the wrapping beyond ExpressJs and Fastify to include router wrapping for other JS backend frameworks!
 
 Thank you:)
 
