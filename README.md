@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/github/last-commit/islamaf/router-wrapper-js">
 </p>
 
-**RouterWrapperJS** is a wrapper for backend frameworks routes, making them more compact with better chaining. Abstracting middlewares and other functions.
+**RouterWrapperJS** is a wrapper for backend frameworks routes, making them more compact with better chaining and custom middleware sharing. Abstracting middlewares and other functions.
 
 Currently supported frameworks:
 * Express
