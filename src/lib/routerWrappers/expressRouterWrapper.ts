@@ -5,7 +5,7 @@ type HttpMethod = "get" | "post" | "patch" | "delete";
 type RouteParams = {
     path: string;
     handler: Function;
-    middlewares?: any[];
+    middleware?: any[];
 };
 type Services = {
     auth?: any;
@@ -19,6 +19,7 @@ interface ExpressRouterWrapper {
     protectedPatch(params: RouteParams): this;
     delete(params: RouteParams): this;
     protectedDelete(params: RouteParams): this;
+    shareTo(routes: string[]): this;
     make(): Router;
 }
 
@@ -27,7 +28,21 @@ interface ExpressRouterWrapper {
  */
 class ExpressRouterWrapper implements ExpressRouterWrapper {
     private router: Router;
-    constructor(private services: Services = {}) {
+    private routes: {
+        get: string[];
+        post: string[];
+        patch: string[];
+        delete: string[];
+    } = {
+        get: [],
+        post: [],
+        patch: [],
+        delete: []
+    };
+    constructor(
+        private services: Services = {},
+        private sharedMiddleware?: Function[]
+    ) {
         this.router = Router();
     }
 
@@ -36,7 +51,7 @@ class ExpressRouterWrapper implements ExpressRouterWrapper {
     }
 
     protectedGet(params: RouteParams) {
-        params.middlewares = this.makeProtectedMiddleware(params.middlewares);
+        params.middleware = this.makeProtectedMiddleware(params.middleware);
         return this.handleRoute("get", params);
     }
 
@@ -45,7 +60,7 @@ class ExpressRouterWrapper implements ExpressRouterWrapper {
     }
 
     protectedPost(params: RouteParams) {
-        params.middlewares = this.makeProtectedMiddleware(params.middlewares);
+        params.middleware = this.makeProtectedMiddleware(params.middleware);
         return this.handleRoute("post", params);
     }
 
@@ -54,7 +69,7 @@ class ExpressRouterWrapper implements ExpressRouterWrapper {
     }
 
     protectedPatch(params: RouteParams) {
-        params.middlewares = this.makeProtectedMiddleware(params.middlewares);
+        params.middleware = this.makeProtectedMiddleware(params.middleware);
         return this.handleRoute("patch", params);
     }
 
@@ -63,9 +78,30 @@ class ExpressRouterWrapper implements ExpressRouterWrapper {
     }
 
     protectedDelete(params: RouteParams) {
-        params.middlewares = this.makeProtectedMiddleware(params.middlewares);
+        params.middleware = this.makeProtectedMiddleware(params.middleware);
         return this.handleRoute("delete", params);
     }
+
+    /**
+     * Add routes to use the shared middlewares
+     * @param routes string
+     * @returns this
+     */
+    shareTo = (routes: string[]) => {
+        if (routes.length > 0 && this.sharedMiddleware?.length === 0) {
+            throw new Error("No middleware to share");
+        }
+
+        routes.forEach((route: string) => {
+            const splitRoute = route.split(" ");
+            const method = <HttpMethod>splitRoute[0].toLowerCase();
+            const path = splitRoute[1];
+
+            this.routes[method].push(path);
+        });
+
+        return this;
+    };
 
     /**
      * Make the Express router ready to use
@@ -87,28 +123,39 @@ class ExpressRouterWrapper implements ExpressRouterWrapper {
     };
 
     private handleRoute = (method: HttpMethod, params: RouteParams) => {
-        const middlwares = params.middlewares?.map((m) =>
-            this.expressMiddlewareWrapper(m)
-        );
+        const middlwares =
+            params.middleware?.map((m) => this.expressMiddlewareWrapper(m)) ??
+            [];
+        middlwares.push(...this.shareMiddleware(method, params.path));
         this.router[method](
             params.path,
-            middlwares ?? [],
+            middlwares,
             expressCfw(params.handler)
         );
         return this;
     };
 
-    private makeProtectedMiddleware = (middlewares?: any[]) => {
+    private shareMiddleware = (method: HttpMethod, path: string) => {
+        if (this.sharedMiddleware && this.routes[method].includes(path)) {
+            return this.sharedMiddleware.map((m) =>
+                this.expressMiddlewareWrapper(m)
+            );
+        }
+
+        return [];
+    };
+
+    private makeProtectedMiddleware = (middleware?: any[]) => {
         if (!this.services?.auth) {
             throw new Error(
                 "Add an authentication function in the constructor to be able to use protected routes."
             );
         }
 
-        if (middlewares === undefined) {
+        if (middleware === undefined) {
             return [this.services.auth];
         }
-        return [this.services.auth, ...middlewares];
+        return [this.services.auth, ...middleware];
     };
 }
 

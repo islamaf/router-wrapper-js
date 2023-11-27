@@ -1,4 +1,10 @@
-import { FastifyInstance, FastifyPluginCallback, RouteOptions } from "fastify";
+import {
+    FastifyInstance,
+    FastifyPluginCallback,
+    FastifyReply,
+    FastifyRequest,
+    RouteOptions
+} from "fastify";
 import { fastifyCfw } from "../controllerWrappers";
 
 type HttpMethod = "get" | "post" | "patch" | "delete";
@@ -20,6 +26,7 @@ interface FastifyRouterWrapper {
     protectedPatch(params: RouteParams): this;
     delete(params: RouteParams): this;
     protectedDelete(params: RouteParams): this;
+    shareTo(routes: string[]): this;
     make(): FastifyPluginCallback;
 }
 
@@ -28,9 +35,21 @@ interface FastifyRouterWrapper {
  */
 class FastifyRouterWrapper implements FastifyRouterWrapper {
     private routes: RouteOptions[] = [];
+    private routesShared: {
+        get: string[];
+        post: string[];
+        patch: string[];
+        delete: string[];
+    } = {
+        get: [],
+        post: [],
+        patch: [],
+        delete: []
+    };
     constructor(
         private fastifyApp: FastifyInstance,
-        private services?: Services
+        private services?: Services,
+        private sharedPreHandler?: any[]
     ) {}
 
     get(params: RouteParams) {
@@ -77,6 +96,22 @@ class FastifyRouterWrapper implements FastifyRouterWrapper {
         return this;
     }
 
+    shareTo(routes: string[]) {
+        if (routes.length > 0 && this.sharedPreHandler?.length === 0) {
+            throw new Error("No middleware to share");
+        }
+
+        routes.forEach((route: string) => {
+            const splitRoute = route.split(" ");
+            const method = <HttpMethod>splitRoute[0].toLowerCase();
+            const path = splitRoute[1];
+
+            this.routesShared[method].push(path);
+        });
+
+        return this;
+    }
+
     /**
      * Make the Fastify router ready to register
      * @returns Fastify router
@@ -99,16 +134,35 @@ class FastifyRouterWrapper implements FastifyRouterWrapper {
         return registerRoutes;
     };
 
+    private fastifyMiddlewareWrapper = (middleware: Function) => {
+        return async (req: FastifyRequest, reply: FastifyReply) => {
+            await middleware();
+        };
+    };
+
     private handleRoute = (method: HttpMethod, params: RouteParams) => {
+        let preHandlers = params.preHandler ?? [];
+        preHandlers.push(...this.shareMiddleware(method, params.path));
+        preHandlers = preHandlers.map((ph) =>
+            this.fastifyMiddlewareWrapper(ph)
+        );
         const route: RouteOptions = {
             method,
             schema: params.schema,
-            preHandler: params.preHandler,
+            preHandler: preHandlers,
             url: params.path,
             handler: fastifyCfw(params.handler)
         };
         this.routes.push(route);
         return route;
+    };
+
+    private shareMiddleware = (method: HttpMethod, path: string) => {
+        if (this.sharedPreHandler && this.routesShared[method].includes(path)) {
+            return this.sharedPreHandler.map((ph) => ph);
+        }
+
+        return [];
     };
 
     private makeProtectedPreHandler = (preHandler?: any[]) => {

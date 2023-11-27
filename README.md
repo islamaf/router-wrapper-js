@@ -31,7 +31,7 @@ The basic structure for route params:
     {
         path: string;
         handler: Function; // Controller function
-        middlewares?: any[]; // Middlewares
+        middleware?: any[]; // Middlewares
     }
     ```
 * Fastify
@@ -56,12 +56,12 @@ const router = new ExpressRouterWrapper({ auth?: YOUR_AUTH_MIDDLEWARE })
     .get({
         path: "/", 
         handler: async () => await homeController(),
-        middlewares: [MIDDLWARE_1, MIDDLWARE_2, MIDDLWARE_3]
+        middleware: [MIDDLWARE_1, MIDDLWARE_2, MIDDLWARE_3]
     })
     .protectedGet({
         path: "/user", 
         handler: async (req: Request) => await userController(req),
-        middlewares: [MIDDLWARE_1, MIDDLWARE_2, MIDDLWARE_3]
+        middleware: [MIDDLWARE_1, MIDDLWARE_2, MIDDLWARE_3]
     })
     .post({
         path: "/user", 
@@ -146,6 +146,58 @@ fastify.register(route);
 
 fastify.listen({ port: 5000 });
 ```
+
+# Sharing Middleware
+Sharing middleware in both Express and Fastify router wrappers, allows middleware to be applied for some routes which are in the ```shared middleware``` array and ignoring routes not in the array. Usage example:
+
+### With Express
+```ts
+const router = new ExpressRouterWrapper(
+    { auth: AUTH },
+    [SHARED_MIDDLEWARE_1, SHARED_MIDDLEWARE_2, ..., SHARED_MIDDLEWARE_N] // Shared middleware
+)
+    /**
+     * Routes which share middleware
+     * Here, only GET /user route will have shared middleware applied to it
+     * While PATCH /user and GET /user/data will not have the shared middleware
+     */
+    .shareTo(["GET /user"]) 
+    .get({
+        path: "/user",
+        handler: async (req: Request) => await userController(req)
+    })
+    .patch({
+        path: "/user",
+        handler: async (req: Request) => await editUserController(req),
+        middleware: [MIDDLEWARE]
+    })
+    .protectedGet({
+        path: "/user/data",
+        handler: async (req: Request) => await userDataController(req),
+        middleware: [MIDDLEWARE]
+    })
+    .make();
+```
+
+### With Fastify
+```ts
+const routes = new FastifyRouterWrapper(fastify, { auth }, [
+    SHARED_MIDDLEWARE_1, SHARED_MIDDLEWARE_2, ..., SHARED_MIDDLEWARE_N
+])
+    .shareTo(["GET /user"])
+    .protectedGet({
+        path: "/user",
+        handler: async (request: FastifyRequest, reply: FastifyReply) => await userController(req),
+        preHandler: [PREHANDLERS]
+    })
+    .patch({
+        path: "/book",
+        handler: async (request: FastifyRequest, reply: FastifyReply) => await bookController(req),
+        preHandler: [PREHANDLERS]
+    })
+    .make();
+```
+
 
 # Controller Handler
 The router wrapper has an internal controller handler wrapper for both the Express and Fastify. Basically wrapping the controller function passed to the route function. The format of the expected returned ```data``` object from the controller function in your ```app``` is supposed to look like this:
