@@ -1,6 +1,6 @@
 {
   "name": "router-wrapper-js",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "A router wrapper for Express and Fastify",
   "repository": {
     "type": "git",
