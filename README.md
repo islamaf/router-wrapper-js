@@ -177,25 +177,6 @@ const router = new ExpressRouterWrapper(
      * While PATCH /user and GET /user/data will not have the shared middleware
      */
     .shareTo(["GET /user"])
-    /**
-     * Allowing multiple methods to a route
-     * Order of methods defines the order of route handlers
-     */
-    .multiple(
-        "/user",
-        ["GET", "POST"],
-        [
-            {
-                // Here the handler is for the GET method
-                handler: async (req: Request) => await getUserController(req)
-                middleware: [MIDDLEWARE_1]
-            },
-            {
-                // And here the handler is for the POST method
-                handler: async (req: Request) => await createUserController(req)
-            }
-        ]
-    )
     .get({
         path: "/user",
         handler: async (req: Request) => await userController(req)

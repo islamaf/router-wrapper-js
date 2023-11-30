@@ -92,7 +92,7 @@ class ExpressRouterWrapper implements ExpressRouterWrapper {
      * @param routes string
      * @returns this
      */
-    shareTo = (routes: string[]) => {
+    shareTo(routes: string[]) {
         if (routes.length > 0 && this.sharedMiddleware?.length === 0) {
             throw new Error("No middleware to share");
         }
