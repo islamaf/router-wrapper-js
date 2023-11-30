@@ -8,7 +8,7 @@
   },
   "types": "src/types/index.d.ts",
   "author": "Islam Abdelfattah <islam_9t9@yahoo.com>",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc"
   },
