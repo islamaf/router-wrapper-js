@@ -20,6 +20,11 @@ interface ExpressRouterWrapper {
     delete(params: RouteParams): this;
     protectedDelete(params: RouteParams): this;
     shareTo(routes: string[]): this;
+    multiple(
+        path: string,
+        methods: string[],
+        params: Omit<RouteParams, "path">[]
+    ): this;
     make(): Router;
 }
 
@@ -102,6 +107,27 @@ class ExpressRouterWrapper implements ExpressRouterWrapper {
 
         return this;
     };
+
+    /**
+     * Accept multiple methods for one route each method would have a separate handler and middleware.
+     * Route parameters are also set as per the sequence of the methods[]
+     * e.g:
+     * if
+     *   methods=["get", "post"]
+     * then the route parameters would look like this
+     *   [GET_ROUTE_PARAMS, POST_ROUTE_PARAMS]
+     * so the route parameters order follows the methods array order
+     */
+    multiple(
+        path: string,
+        methods: HttpMethod[],
+        params: Omit<RouteParams, "path">[]
+    ) {
+        methods.forEach((method, idx) =>
+            this.handleRoute(method, { ...params[idx], path })
+        );
+        return this;
+    }
 
     /**
      * Make the Express router ready to use

@@ -27,6 +27,11 @@ interface FastifyRouterWrapper {
     delete(params: RouteParams): this;
     protectedDelete(params: RouteParams): this;
     shareTo(routes: string[]): this;
+    multiple(
+        path: string,
+        methods: string[],
+        params: Omit<RouteParams, "path">[]
+    ): this;
     make(): FastifyPluginCallback;
 }
 
@@ -109,6 +114,17 @@ class FastifyRouterWrapper implements FastifyRouterWrapper {
             this.routesShared[method].push(path);
         });
 
+        return this;
+    }
+
+    multiple(
+        path: string,
+        methods: HttpMethod[],
+        params: Omit<RouteParams, "path">[]
+    ) {
+        methods.forEach((method, idx) =>
+            this.handleRoute(method, { ...params[idx], path })
+        );
         return this;
     }
 
