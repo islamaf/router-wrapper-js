@@ -203,7 +203,7 @@ const routes = new FastifyRouterWrapper(fastify, { auth }, [
     .shareTo(["GET /user"])
     .multiple(
         "/user",
-        ["GET", "POST"],
+        ["get", "post"],
         [
             {
                 handler: async (request: FastifyRequest, reply: FastifyReply) => await getUserController(req)
@@ -245,7 +245,7 @@ const router = new ExpressRouterWrapper(
      */
     .multiple(
         "/user",
-        ["GET", "POST"],
+        ["get", "post"],
         [
             {
                 // Here the handler is for the GET method
@@ -270,7 +270,7 @@ const routes = new FastifyRouterWrapper(fastify, { auth }, [
     .shareTo(["GET /user"])
     .multiple(
         "/user",
-        ["GET", "POST"],
+        ["get", "post"],
         [
             {
                 handler: async (request: FastifyRequest, reply: FastifyReply) => await getUserController(req)
