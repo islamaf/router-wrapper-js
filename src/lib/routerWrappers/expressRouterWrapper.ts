@@ -42,7 +42,7 @@ class ExpressRouterWrapper implements ExpressRouterWrapper {
         get: [],
         post: [],
         patch: [],
-        delete: []
+        delete: [],
     };
     constructor(
         private services: Services = {},
@@ -106,7 +106,7 @@ class ExpressRouterWrapper implements ExpressRouterWrapper {
         });
 
         return this;
-    };
+    }
 
     /**
      * Accept multiple methods for one route each method would have a separate handler and middleware.
@@ -137,21 +137,8 @@ class ExpressRouterWrapper implements ExpressRouterWrapper {
         return this.router;
     }
 
-    private expressMiddlewareWrapper = (middleware: Function) => {
-        return async (req: Request, res: Response, next: NextFunction) => {
-            try {
-                await middleware();
-                next();
-            } catch (e) {
-                next(e);
-            }
-        };
-    };
-
     private handleRoute = (method: HttpMethod, params: RouteParams) => {
-        const middlwares =
-            params.middleware?.map((m) => this.expressMiddlewareWrapper(m)) ??
-            [];
+        const middlwares = params.middleware ?? [];
         middlwares.push(...this.shareMiddleware(method, params.path));
         this.router[method](
             params.path,
@@ -163,9 +150,7 @@ class ExpressRouterWrapper implements ExpressRouterWrapper {
 
     private shareMiddleware = (method: HttpMethod, path: string) => {
         if (this.sharedMiddleware && this.routes[method].includes(path)) {
-            return this.sharedMiddleware.map((m) =>
-                this.expressMiddlewareWrapper(m)
-            );
+            return this.sharedMiddleware;
         }
 
         return [];
